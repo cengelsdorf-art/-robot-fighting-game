@@ -2,17 +2,20 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0, user-scalable=no">
+
 <title>Robot Fighters 3D</title>
 
 <style>
+
 html,body{
     margin:0;
     padding:0;
-    overflow:hidden;
     width:100%;
     height:100%;
-    background:#111;
+    overflow:hidden;
+    background:#101820;
     font-family:Arial,sans-serif;
     touch-action:none;
 }
@@ -23,137 +26,192 @@ canvas{
 
 #hud{
     position:fixed;
-    top:12px;
+    top:10px;
     left:0;
     width:100%;
     z-index:5;
-    pointer-events:none;
     color:white;
     text-align:center;
-    font-weight:bold;
+    pointer-events:none;
 }
 
 #title{
     font-size:25px;
-    text-shadow:0 2px 5px #000;
+    font-weight:bold;
+    text-shadow:0 2px 5px black;
 }
 
 #round{
     margin-top:4px;
+    font-weight:bold;
 }
 
 .bar{
     position:absolute;
     top:48px;
-    height:24px;
-    width:36%;
+    height:25px;
+    width:35%;
     border:3px solid white;
     border-radius:8px;
     background:#222;
     overflow:hidden;
 }
 
-#playerBar{left:10px;}
-#enemyBar{right:10px;}
+#playerBar{
+    left:10px;
+}
+
+#enemyBar{
+    right:10px;
+}
 
 .hp{
     width:100%;
     height:100%;
 }
 
-#playerHP{background:#18d66b;}
-#enemyHP{background:#e53935;}
+#playerHP{
+    background:#16d66b;
+}
+
+#enemyHP{
+    background:#e53935;
+}
+
+
+/* JOYSTICK */
 
 #joystick{
     position:fixed;
     left:25px;
     bottom:25px;
+
     width:140px;
     height:140px;
+
     border-radius:50%;
-    background:rgba(255,255,255,.16);
+
+    background:rgba(255,255,255,.15);
     border:3px solid rgba(255,255,255,.35);
+
     z-index:10;
-    touch-action:none;
 }
 
 #stick{
     position:absolute;
-    left:38px;
-    top:38px;
+
     width:64px;
     height:64px;
+
+    left:38px;
+    top:38px;
+
     border-radius:50%;
-    background:rgba(255,255,255,.55);
+
+    background:rgba(255,255,255,.6);
 }
+
+
+/* BUTTONS */
 
 .action{
     position:fixed;
     z-index:10;
+
     border:0;
     border-radius:50%;
+
     color:white;
     font-weight:bold;
+
     box-shadow:0 4px 10px #0008;
+
     touch-action:none;
 }
 
 #punch{
     right:135px;
     bottom:105px;
+
     width:82px;
     height:82px;
+
     background:#e53935;
 }
 
 #kick{
     right:30px;
     bottom:35px;
+
     width:90px;
     height:90px;
+
     background:#ff9800;
 }
 
 #block{
     right:130px;
     bottom:18px;
+
     width:72px;
     height:72px;
+
     background:#1976d2;
 }
 
+
+/* MITTEILUNG */
+
 #message{
     display:none;
+
     position:fixed;
     inset:0;
+
     z-index:20;
-    background:#000b;
+
+    background:rgba(0,0,0,.75);
+
     color:white;
+
     align-items:center;
     justify-content:center;
+
     flex-direction:column;
+
     text-align:center;
 }
 
 #message h1{
     font-size:42px;
+    margin:10px;
 }
 
-#restart{
+#message button{
     padding:15px 30px;
+
     border:0;
     border-radius:10px;
+
     font-size:18px;
     font-weight:bold;
 }
+
 </style>
 </head>
 
 <body>
 
+
 <div id="hud">
-    <div id="title">ROBOT FIGHTERS</div>
-    <div id="round">Runde 1</div>
+
+    <div id="title">
+        ROBOT FIGHTERS
+    </div>
+
+    <div id="round">
+        Runde 1
+    </div>
 
     <div class="bar" id="playerBar">
         <div class="hp" id="playerHP"></div>
@@ -162,21 +220,46 @@ canvas{
     <div class="bar" id="enemyBar">
         <div class="hp" id="enemyHP"></div>
     </div>
+
 </div>
+
 
 <div id="joystick">
+
     <div id="stick"></div>
+
 </div>
 
-<button class="action" id="punch">PUNCH</button>
-<button class="action" id="kick">KICK</button>
-<button class="action" id="block">BLOCK</button>
+
+<button class="action" id="punch">
+    PUNCH
+</button>
+
+<button class="action" id="kick">
+    KICK
+</button>
+
+<button class="action" id="block">
+    BLOCK
+</button>
+
 
 <div id="message">
-    <h1 id="messageTitle">KNOCKOUT!</h1>
-    <p id="messageText"></p>
-    <button id="restart">NOCHMAL</button>
+
+    <h1 id="messageTitle">
+        SIEG!
+    </h1>
+
+    <p id="messageText">
+        Du hast gewonnen!
+    </p>
+
+    <button id="nextRound">
+        NÄCHSTE RUNDE
+    </button>
+
 </div>
+
 
 <script type="module">
 
@@ -184,36 +267,53 @@ import * as THREE from
 "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js";
 
 
-// ================================
-// 3D-WELT
-// ================================
+// =====================================================
+// SZENE
+// =====================================================
 
 const scene = new THREE.Scene();
 
-scene.background = new THREE.Color(0x101820);
+scene.background =
+new THREE.Color(0x101820);
 
-const camera = new THREE.PerspectiveCamera(
+
+const camera =
+new THREE.PerspectiveCamera(
     60,
-    innerWidth / innerHeight,
-    0.1,
+    innerWidth/innerHeight,
+    .1,
     100
 );
 
-camera.position.set(0,7,11);
+camera.position.set(
+    0,
+    7,
+    11
+);
 
-const renderer = new THREE.WebGLRenderer({
+
+const renderer =
+new THREE.WebGLRenderer({
     antialias:true
 });
 
-renderer.setSize(innerWidth,innerHeight);
-renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.setSize(
+    innerWidth,
+    innerHeight
+);
 
-document.body.appendChild(renderer.domElement);
+renderer.setPixelRatio(
+    Math.min(devicePixelRatio,2)
+);
+
+document.body.appendChild(
+    renderer.domElement
+);
 
 
-// ================================
+// =====================================================
 // LICHT
-// ================================
+// =====================================================
 
 scene.add(
     new THREE.HemisphereLight(
@@ -223,142 +323,273 @@ scene.add(
     )
 );
 
-const sun = new THREE.DirectionalLight(
+
+const sun =
+new THREE.DirectionalLight(
     0xffffff,
     3
 );
 
-sun.position.set(5,10,5);
+sun.position.set(
+    5,
+    10,
+    5
+);
+
 scene.add(sun);
 
 
-// ================================
+// =====================================================
 // ARENA
-// ================================
+// =====================================================
 
-const arena = new THREE.Mesh(
-    new THREE.BoxGeometry(18,.4,14),
+const floor =
+new THREE.Mesh(
+
+    new THREE.BoxGeometry(
+        18,
+        .4,
+        14
+    ),
+
     new THREE.MeshStandardMaterial({
         color:0x303030
     })
+
 );
 
-arena.position.y=-.2;
-scene.add(arena);
+floor.position.y=-.2;
+
+scene.add(floor);
 
 
-// Ring
+const ring =
+new THREE.Mesh(
 
-const ring = new THREE.Mesh(
-    new THREE.BoxGeometry(14,.08,10),
+    new THREE.BoxGeometry(
+        14,
+        .08,
+        10
+    ),
+
     new THREE.MeshStandardMaterial({
         color:0x555555
     })
+
 );
 
 ring.position.y=.03;
+
 scene.add(ring);
 
 
-// Begrenzungen
+// Wände
 
-function makeWall(x,z,w,d){
+function createWall(
+    x,
+    z,
+    width,
+    depth
+){
 
-    const wall = new THREE.Mesh(
-        new THREE.BoxGeometry(w,1.5,d),
+    const wall =
+    new THREE.Mesh(
+
+        new THREE.BoxGeometry(
+            width,
+            1.5,
+            depth
+        ),
+
         new THREE.MeshStandardMaterial({
             color:0x111111
         })
+
     );
 
-    wall.position.set(x,.75,z);
+    wall.position.set(
+        x,
+        .75,
+        z
+    );
+
     scene.add(wall);
 }
 
-makeWall(0,-6.5,18,.3);
-makeWall(0,6.5,18,.3);
-makeWall(-8.5,0,.3,13);
-makeWall(8.5,0,.3,13);
+createWall(
+    0,
+    -6.5,
+    18,
+    .3
+);
+
+createWall(
+    0,
+    6.5,
+    18,
+    .3
+);
+
+createWall(
+    -8.5,
+    0,
+    .3,
+    13
+);
+
+createWall(
+    8.5,
+    0,
+    .3,
+    13
+);
 
 
-// ================================
+// =====================================================
 // ROBOT
-// ================================
+// =====================================================
 
 function createRobot(color){
 
-    const robot = new THREE.Group();
+    const robot =
+    new THREE.Group();
 
-    const metal = new THREE.MeshStandardMaterial({
+
+    const metal =
+    new THREE.MeshStandardMaterial({
+
         color:color,
+
         metalness:.8,
+
         roughness:.25
+
     });
 
-    const dark = new THREE.MeshStandardMaterial({
+
+    const dark =
+    new THREE.MeshStandardMaterial({
+
         color:0x222222,
+
         metalness:.8
+
     });
 
 
     // Körper
 
-    const body = new THREE.Mesh(
-        new THREE.BoxGeometry(1.35,1.7,.8),
+    const body =
+    new THREE.Mesh(
+
+        new THREE.BoxGeometry(
+            1.35,
+            1.7,
+            .8
+        ),
+
         metal
+
     );
 
     body.position.y=2.7;
+
     robot.add(body);
 
 
     // Kopf
 
-    const head = new THREE.Mesh(
-        new THREE.BoxGeometry(1.15,.9,.9),
+    const head =
+    new THREE.Mesh(
+
+        new THREE.BoxGeometry(
+            1.15,
+            .9,
+            .9
+        ),
+
         metal
+
     );
 
     head.position.y=4.05;
+
     robot.add(head);
 
 
     // Augen
 
-    const eyeMat = new THREE.MeshBasicMaterial({
+    const eyes =
+    new THREE.MeshBasicMaterial({
         color:0x00ffff
     });
 
-    for(const x of [-.25,.25]){
 
-        const eye = new THREE.Mesh(
-            new THREE.BoxGeometry(.22,.12,.05),
-            eyeMat
+    for(
+        const x of [-.25,.25]
+    ){
+
+        const eye =
+        new THREE.Mesh(
+
+            new THREE.BoxGeometry(
+                .22,
+                .12,
+                .05
+            ),
+
+            eyes
+
         );
 
-        eye.position.set(x,4.08,-.48);
+        eye.position.set(
+            x,
+            4.08,
+            -.48
+        );
+
         robot.add(eye);
+
     }
 
 
     // Arme
 
-    const armGeo = new THREE.BoxGeometry(
-        .45,1.5,.45
+    const armGeometry =
+    new THREE.BoxGeometry(
+        .45,
+        1.5,
+        .45
     );
 
-    const leftArm = new THREE.Mesh(
-        armGeo,
+
+    const leftArm =
+    new THREE.Mesh(
+        armGeometry,
         metal
     );
 
-    const rightArm = new THREE.Mesh(
-        armGeo,
+
+    const rightArm =
+    new THREE.Mesh(
+        armGeometry,
         metal
     );
 
-    leftArm.position.set(-1,2.7,0);
-    rightArm.position.set(1,2.7,0);
+
+    leftArm.position.set(
+        -1,
+        2.7,
+        0
+    );
+
+
+    rightArm.position.set(
+        1,
+        2.7,
+        0
+    );
+
 
     robot.add(leftArm);
     robot.add(rightArm);
@@ -366,20 +597,41 @@ function createRobot(color){
 
     // Hände
 
-    const handGeo = new THREE.BoxGeometry(
-        .55,.45,.55
+    const handGeometry =
+    new THREE.BoxGeometry(
+        .55,
+        .45,
+        .55
     );
 
-    const leftHand = new THREE.Mesh(
-        handGeo,dark
+
+    const leftHand =
+    new THREE.Mesh(
+        handGeometry,
+        dark
     );
 
-    const rightHand = new THREE.Mesh(
-        handGeo,dark
+
+    const rightHand =
+    new THREE.Mesh(
+        handGeometry,
+        dark
     );
 
-    leftHand.position.set(-1,1.9,0);
-    rightHand.position.set(1,1.9,0);
+
+    leftHand.position.set(
+        -1,
+        1.9,
+        0
+    );
+
+
+    rightHand.position.set(
+        1,
+        1.9,
+        0
+    );
+
 
     robot.add(leftHand);
     robot.add(rightHand);
@@ -387,158 +639,295 @@ function createRobot(color){
 
     // Beine
 
-    const legGeo = new THREE.BoxGeometry(
-        .5,1.5,.55
+    const legGeometry =
+    new THREE.BoxGeometry(
+        .5,
+        1.5,
+        .55
     );
 
-    const leftLeg = new THREE.Mesh(
-        legGeo,metal
+
+    const leftLeg =
+    new THREE.Mesh(
+        legGeometry,
+        metal
     );
 
-    const rightLeg = new THREE.Mesh(
-        legGeo,metal
+
+    const rightLeg =
+    new THREE.Mesh(
+        legGeometry,
+        metal
     );
 
-    leftLeg.position.set(-.4,1,0);
-    rightLeg.position.set(.4,1,0);
+
+    leftLeg.position.set(
+        -.4,
+        1,
+        0
+    );
+
+
+    rightLeg.position.set(
+        .4,
+        1,
+        0
+    );
+
 
     robot.add(leftLeg);
     robot.add(rightLeg);
 
 
-    robot.userData.leftArm=leftArm;
-    robot.userData.rightArm=rightArm;
-    robot.userData.leftLeg=leftLeg;
-    robot.userData.rightLeg=rightLeg;
+    robot.userData.leftArm =
+    leftArm;
+
+    robot.userData.rightArm =
+    rightArm;
+
+    robot.userData.leftLeg =
+    leftLeg;
+
+    robot.userData.rightLeg =
+    rightLeg;
+
 
     return robot;
 }
 
 
-// ================================
-// SPIELER UND GEGNER
-// ================================
+// =====================================================
+// SPIELER
+// =====================================================
 
-const player=createRobot(0x1677ff);
-const enemy=createRobot(0xff3030);
+const player =
+createRobot(0x1677ff);
 
-player.position.set(-3,0,0);
-enemy.position.set(3,0,0);
+player.position.set(
+    -3,
+    0,
+    0
+);
 
 scene.add(player);
+
+
+// =====================================================
+// GEGNER
+// =====================================================
+
+let enemy =
+createRobot(0xff3030);
+
+enemy.position.set(
+    3,
+    0,
+    0
+);
+
 scene.add(enemy);
 
 
-// ================================
-// SPIELVARIABLEN
-// ================================
-
-let playerHP=100;
-let enemyHP=100;
+// =====================================================
+// RUNDEN-SYSTEM
+// =====================================================
 
 let round=1;
 
-let blocking=false;
-let playerAttack=0;
-let enemyAttack=0;
 
-let joystickX=0;
-let joystickY=0;
+// Gegner wird mit jeder Runde stärker
+
+let enemyMaxHP=100;
+
+let enemyDamage=10;
+
+let enemySpeed=1.4;
+
+let enemyAttackCooldown=1.1;
+
+
+// =====================================================
+// SPIELER-WERTE
+// =====================================================
+
+let playerHP=100;
+
+let playerAttack=0;
+
+let enemyAttackTimer=0;
+
+let blocking=false;
 
 let gameOver=false;
 
 
-// ================================
-// HP
-// ================================
+// Joystick
 
-function updateHP(){
+let joystickX=0;
 
-    document.getElementById("playerHP").style.width =
-        Math.max(0,playerHP)+"%";
-
-    document.getElementById("enemyHP").style.width =
-        Math.max(0,enemyHP)+"%";
-}
-
-
-// ================================
-// JOYSTICK
-// ================================
-
-const joystick=document.getElementById("joystick");
-const stick=document.getElementById("stick");
+let joystickY=0;
 
 let joystickPointer=null;
 
-function joystickMove(e){
 
-    const rect=joystick.getBoundingClientRect();
+// =====================================================
+// HP
+// =====================================================
 
-    let x=e.clientX-(rect.left+rect.width/2);
-    let y=e.clientY-(rect.top+rect.height/2);
+function updateHP(){
 
-    const max=45;
+    document.getElementById(
+        "playerHP"
+    ).style.width =
+        Math.max(
+            0,
+            playerHP
+        )+"%";
 
-    const distance=Math.sqrt(x*x+y*y);
 
-    if(distance>max){
+    document.getElementById(
+        "enemyHP"
+    ).style.width =
+        Math.max(
+            0,
+            enemyHP
+        )+"%";
 
-        x=x/distance*max;
-        y=y/distance*max;
-    }
-
-    stick.style.left=(38+x)+"px";
-    stick.style.top=(38+y)+"px";
-
-    joystickX=x/max;
-    joystickY=y/max;
 }
 
-joystick.addEventListener("pointerdown",e=>{
 
-    joystickPointer=e.pointerId;
+// =====================================================
+// NEUEN GEGNER ERSTELLEN
+// =====================================================
 
-    joystick.setPointerCapture(e.pointerId);
+function createNextEnemy(){
 
-    joystickMove(e);
-});
+    scene.remove(enemy);
 
-joystick.addEventListener("pointermove",e=>{
 
-    if(e.pointerId===joystickPointer){
-        joystickMove(e);
-    }
-});
+    /*
+       Jede Runde:
 
-function resetJoystick(){
+       +25 HP
+       +3 Schaden
+       +0.2 Geschwindigkeit
+       -0.08 Sekunden Angriffspause
+    */
 
-    joystickX=0;
-    joystickY=0;
 
-    stick.style.left="38px";
-    stick.style.top="38px";
+    enemyMaxHP =
+        100 + (round-1)*25;
 
-    joystickPointer=null;
+
+    enemyDamage =
+        10 + (round-1)*3;
+
+
+    enemySpeed =
+        1.4 + (round-1)*.2;
+
+
+    enemyAttackCooldown =
+        Math.max(
+            .45,
+            1.1 - (round-1)*.08
+        );
+
+
+    enemy =
+    createRobot(0xff3030);
+
+
+    enemy.position.set(
+        3,
+        0,
+        0
+    );
+
+
+    scene.add(enemy);
+
+
+    enemyHP =
+        enemyMaxHP;
+
+
+    playerHP=100;
+
+
+    document.getElementById(
+        "round"
+    ).textContent =
+        "Runde "+round;
+
+
+    updateHP();
+
 }
 
-joystick.addEventListener("pointerup",resetJoystick);
-joystick.addEventListener("pointercancel",resetJoystick);
+
+// =====================================================
+// SPIELER BEWEGEN
+// =====================================================
+
+function movePlayer(delta){
+
+    if(gameOver)return;
 
 
-// ================================
-// ANGRIFF
-// ================================
+    const speed=4;
+
+
+    player.position.x +=
+        joystickX*
+        speed*
+        delta;
+
+
+    player.position.z +=
+        joystickY*
+        speed*
+        delta;
+
+
+    player.position.x =
+        THREE.MathUtils.clamp(
+            player.position.x,
+            -6.5,
+            6.5
+        );
+
+
+    player.position.z =
+        THREE.MathUtils.clamp(
+            player.position.z,
+            -4.5,
+            4.5
+        );
+
+}
+
+
+// =====================================================
+// PUNCH
+// =====================================================
 
 function punch(){
 
-    if(gameOver || playerAttack>0)return;
+    if(
+        gameOver ||
+        playerAttack>0
+    )return;
+
 
     playerAttack=.35;
 
-    const distance=player.position.distanceTo(
-        enemy.position
-    );
+
+    const distance =
+        player.position.distanceTo(
+            enemy.position
+        );
+
 
     if(distance<2.8){
 
@@ -546,20 +935,34 @@ function punch(){
 
         updateHP();
 
+
         enemy.position.z+=.25;
+
     }
+
 }
 
 
+// =====================================================
+// KICK
+// =====================================================
+
 function kick(){
 
-    if(gameOver || playerAttack>0)return;
+    if(
+        gameOver ||
+        playerAttack>0
+    )return;
+
 
     playerAttack=.55;
 
-    const distance=player.position.distanceTo(
-        enemy.position
-    );
+
+    const distance =
+        player.position.distanceTo(
+            enemy.position
+        );
+
 
     if(distance<3){
 
@@ -567,110 +970,286 @@ function kick(){
 
         updateHP();
 
+
         enemy.position.z+=.4;
+
     }
+
 }
 
 
-// ================================
+// =====================================================
 // BUTTONS
-// ================================
+// =====================================================
 
-document.getElementById("punch")
-.addEventListener("pointerdown",punch);
-
-document.getElementById("kick")
-.addEventListener("pointerdown",kick);
-
-const blockButton=document.getElementById("block");
-
-blockButton.addEventListener("pointerdown",()=>{
-    blocking=true;
-});
-
-blockButton.addEventListener("pointerup",()=>{
-    blocking=false;
-});
-
-blockButton.addEventListener("pointercancel",()=>{
-    blocking=false;
-});
+document.getElementById(
+    "punch"
+).addEventListener(
+    "pointerdown",
+    punch
+);
 
 
-// ================================
+document.getElementById(
+    "kick"
+).addEventListener(
+    "pointerdown",
+    kick
+);
+
+
+const blockButton =
+document.getElementById(
+    "block"
+);
+
+
+blockButton.addEventListener(
+    "pointerdown",
+    ()=>{
+        blocking=true;
+    }
+);
+
+
+blockButton.addEventListener(
+    "pointerup",
+    ()=>{
+        blocking=false;
+    }
+);
+
+
+blockButton.addEventListener(
+    "pointercancel",
+    ()=>{
+        blocking=false;
+    }
+);
+
+
+// =====================================================
+// JOYSTICK
+// =====================================================
+
+const joystick =
+document.getElementById(
+    "joystick"
+);
+
+
+const stick =
+document.getElementById(
+    "stick"
+);
+
+
+function moveJoystick(e){
+
+    const rect =
+        joystick.getBoundingClientRect();
+
+
+    let x =
+        e.clientX -
+        (
+            rect.left+
+            rect.width/2
+        );
+
+
+    let y =
+        e.clientY -
+        (
+            rect.top+
+            rect.height/2
+        );
+
+
+    const max=45;
+
+
+    const distance =
+        Math.sqrt(
+            x*x+y*y
+        );
+
+
+    if(distance>max){
+
+        x =
+            x/distance*max;
+
+        y =
+            y/distance*max;
+
+    }
+
+
+    stick.style.left =
+        (38+x)+"px";
+
+
+    stick.style.top =
+        (38+y)+"px";
+
+
+    joystickX=x/max;
+
+    joystickY=y/max;
+
+}
+
+
+joystick.addEventListener(
+    "pointerdown",
+    e=>{
+
+        joystickPointer=
+            e.pointerId;
+
+        joystick.setPointerCapture(
+            e.pointerId
+        );
+
+        moveJoystick(e);
+
+    }
+);
+
+
+joystick.addEventListener(
+    "pointermove",
+    e=>{
+
+        if(
+            e.pointerId===
+            joystickPointer
+        ){
+
+            moveJoystick(e);
+
+        }
+
+    }
+);
+
+
+function resetJoystick(){
+
+    joystickX=0;
+
+    joystickY=0;
+
+    stick.style.left="38px";
+
+    stick.style.top="38px";
+
+    joystickPointer=null;
+
+}
+
+
+joystick.addEventListener(
+    "pointerup",
+    resetJoystick
+);
+
+
+joystick.addEventListener(
+    "pointercancel",
+    resetJoystick
+);
+
+
+// =====================================================
 // GEGNER-KI
-// ================================
+// =====================================================
 
 function enemyAI(delta){
 
     if(gameOver)return;
 
-    const distance=enemy.position.distanceTo(
-        player.position
-    );
 
-    // Zum Spieler laufen
+    const distance =
+        enemy.position.distanceTo(
+            player.position
+        );
 
-    if(distance>2.4){
 
-        const direction=new THREE.Vector3()
-            .subVectors(player.position,enemy.position)
+    // Gegner läuft schneller je höher die Runde
+
+    if(distance>2.5){
+
+        const direction =
+            new THREE.Vector3()
+            .subVectors(
+                player.position,
+                enemy.position
+            )
             .normalize();
 
-        enemy.position.x += direction.x*delta*1.4;
-        enemy.position.z += direction.z*delta*1.4;
+
+        enemy.position.x +=
+            direction.x*
+            enemySpeed*
+            delta;
+
+
+        enemy.position.z +=
+            direction.z*
+            enemySpeed*
+            delta;
+
     }
 
-    enemyAttack-=delta;
 
-    if(distance<2.7 && enemyAttack<=0){
+    enemyAttackTimer-=delta;
 
-        enemyAttack=1.1;
 
-        if(!blocking){
+    if(
+        distance<2.7 &&
+        enemyAttackTimer<=0
+    ){
 
-            playerHP-=10;
+        enemyAttackTimer =
+            enemyAttackCooldown;
 
-            updateHP();
+
+        let damage =
+            enemyDamage;
+
+
+        // Block reduziert Schaden
+
+        if(blocking){
+
+            damage*=.25;
+
         }
+
+
+        playerHP-=damage;
+
+        updateHP();
+
     }
+
 }
 
 
-// ================================
-// SPIELER BEWEGEN
-// ================================
-
-function movePlayer(delta){
-
-    if(gameOver)return;
-
-    const speed=4;
-
-    player.position.x +=
-        joystickX*speed*delta;
-
-    player.position.z +=
-        joystickY*speed*delta;
-
-    player.position.x=THREE.MathUtils.clamp(
-        player.position.x,-6.5,6.5
-    );
-
-    player.position.z=THREE.MathUtils.clamp(
-        player.position.z,-4.5,4.5
-    );
-}
-
-
-// ================================
-// ANGRIFF-ANIMATIONEN
-// ================================
+// =====================================================
+// ANIMATION
+// =====================================================
 
 function animatePlayer(){
 
-    const left=player.userData.leftArm;
-    const right=player.userData.rightArm;
+    const left =
+        player.userData.leftArm;
+
+    const right =
+        player.userData.rightArm;
+
 
     if(playerAttack>0){
 
@@ -679,166 +1258,293 @@ function animatePlayer(){
     }else{
 
         right.rotation.x=0;
+
     }
+
 
     if(blocking){
 
         left.rotation.x=-1.2;
+
         right.rotation.x=-1.2;
 
-    }else if(playerAttack<=0){
+    }
+    else if(playerAttack<=0){
 
         left.rotation.x=0;
+
     }
+
 }
 
 
-// ================================
-// ENDE
-// ================================
+// =====================================================
+// RUNDE GEWONNEN
+// =====================================================
 
-function checkGame(){
+function winRound(){
 
-    if(enemyHP<=0 && !gameOver){
-
-        gameOver=true;
-
-        document.getElementById("messageTitle")
-        .textContent="SIEG!";
-
-        document.getElementById("messageText")
-        .textContent="Du hast den Roboter besiegt!";
-
-        document.getElementById("message")
-        .style.display="flex";
-    }
+    gameOver=true;
 
 
-    if(playerHP<=0 && !gameOver){
+    document.getElementById(
+        "messageTitle"
+    ).textContent =
+        "SIEG!";
 
-        gameOver=true;
 
-        document.getElementById("messageTitle")
-        .textContent="VERLOREN";
+    document.getElementById(
+        "messageText"
+    ).textContent =
+        "Runde "+round+
+        " gewonnen! Der nächste Roboter wird stärker.";
 
-        document.getElementById("messageText")
-        .textContent="Der Gegner war stärker.";
 
-        document.getElementById("message")
-        .style.display="flex";
-    }
+    document.getElementById(
+        "message"
+    ).style.display="flex";
+
 }
 
 
-// ================================
-// NEUSTART
-// ================================
+// =====================================================
+// SPIEL VERLOREN
+// =====================================================
 
-document.getElementById("restart")
-.addEventListener("click",()=>{
+function loseGame(){
 
-    playerHP=100;
-    enemyHP=100;
-
-    player.position.set(-3,0,0);
-    enemy.position.set(3,0,0);
-
-    playerAttack=0;
-    enemyAttack=0;
-
-    blocking=false;
-    gameOver=false;
-
-    updateHP();
-
-    document.getElementById("message")
-    .style.display="none";
-});
+    gameOver=true;
 
 
-// ================================
+    document.getElementById(
+        "messageTitle"
+    ).textContent =
+        "VERLOREN";
+
+
+    document.getElementById(
+        "messageText"
+    ).textContent =
+        "Du bist bis Runde "+
+        round+
+        " gekommen.";
+
+
+    document.getElementById(
+        "nextRound"
+    ).textContent =
+        "NOCHMAL";
+
+
+    document.getElementById(
+        "message"
+    ).style.display="flex";
+
+}
+
+
+// =====================================================
+// NÄCHSTE RUNDE
+// =====================================================
+
+document.getElementById(
+    "nextRound"
+).addEventListener(
+    "click",
+    ()=>{
+
+        const button =
+            document.getElementById(
+                "nextRound"
+            );
+
+
+        // Wenn Spieler verloren hat:
+        if(playerHP<=0){
+
+            round=1;
+
+            button.textContent=
+                "NÄCHSTE RUNDE";
+
+        }
+
+        else{
+
+            round++;
+
+        }
+
+
+        document.getElementById(
+            "message"
+        ).style.display="none";
+
+
+        gameOver=false;
+
+
+        createNextEnemy();
+
+    }
+);
+
+
+// =====================================================
 // KAMERA
-// ================================
+// =====================================================
 
 function updateCamera(){
 
-    const middle=new THREE.Vector3()
-        .addVectors(player.position,enemy.position)
+    const middle =
+        new THREE.Vector3()
+        .addVectors(
+            player.position,
+            enemy.position
+        )
         .multiplyScalar(.5);
 
-    camera.position.x=
+
+    camera.position.x =
         THREE.MathUtils.lerp(
             camera.position.x,
             middle.x,
             .05
         );
 
-    camera.position.z=
+
+    camera.position.z =
         THREE.MathUtils.lerp(
             camera.position.z,
             middle.z+10,
             .05
         );
 
+
     camera.lookAt(
         middle.x,
         2,
         middle.z
     );
+
 }
 
 
-// ================================
-// GAME LOOP
-// ================================
+// =====================================================
+// SPIEL-CHECK
+// =====================================================
 
-let last=performance.now();
+function checkGame(){
+
+    if(
+        enemyHP<=0 &&
+        !gameOver
+    ){
+
+        winRound();
+
+    }
+
+
+    if(
+        playerHP<=0 &&
+        !gameOver
+    ){
+
+        loseGame();
+
+    }
+
+}
+
+
+// =====================================================
+// GAME LOOP
+// =====================================================
+
+let last=
+    performance.now();
+
 
 function gameLoop(){
 
-    requestAnimationFrame(gameLoop);
+    requestAnimationFrame(
+        gameLoop
+    );
 
-    const now=performance.now();
 
-    let delta=(now-last)/1000;
+    const now=
+        performance.now();
+
+
+    let delta=
+        (now-last)/1000;
+
 
     last=now;
 
-    delta=Math.min(delta,.05);
+
+    delta=
+        Math.min(
+            delta,
+            .05
+        );
+
 
     if(playerAttack>0){
+
         playerAttack-=delta;
+
     }
 
+
     movePlayer(delta);
+
     enemyAI(delta);
+
     animatePlayer();
+
     checkGame();
+
     updateCamera();
 
-    renderer.render(scene,camera);
+
+    renderer.render(
+        scene,
+        camera
+    );
+
 }
 
+
 updateHP();
+
 gameLoop();
 
 
-// ================================
-// iPAD GRÖSSE
-// ================================
+// =====================================================
+// iPAD RESIZE
+// =====================================================
 
-window.addEventListener("resize",()=>{
+window.addEventListener(
+    "resize",
+    ()=>{
 
-    camera.aspect=
-        innerWidth/innerHeight;
+        camera.aspect =
+            innerWidth/
+            innerHeight;
 
-    camera.updateProjectionMatrix();
 
-    renderer.setSize(
-        innerWidth,
-        innerHeight
-    );
-});
+        camera.updateProjectionMatrix();
+
+
+        renderer.setSize(
+            innerWidth,
+            innerHeight
+        );
+
+    }
+);
 
 </script>
 
